@@ -18,6 +18,88 @@ Struttura ad alto livello (solo IA)
 - `logs`: output dei tracer in formato jsonl.
 - `data`: esempi di input/output demo.
 
+Mappa di tutto quello che sta succedendo (overview)
+- Avvio: `apps/api/src/main.ts` -> `apps/api/src/app.ts` (Express + middleware).
+- Rotte: `apps/api/src/routes/health.ts` (healthcheck) e `apps/api/src/routes/workflow.ts` (trigger workflow).
+- Orchestrazione: `apps/api/src/workflows/orchestrator.ts` gestisce stati, retry e checkpoint.
+- Workflow demo: `apps/api/src/workflows/demoWorkflow.ts` orchestra la sequenza di agenti.
+- Agenti: `apps/api/src/agents/*Agent.ts` (planner, implementer, reviewer, evaluator, security).
+- Tooling: `apps/api/src/tools/toolRegistry.ts` + `apps/api/src/tools/*Tools.ts` (allowlist tool).
+- Memoria: `apps/api/src/memory/*Store.ts` (short/long term + checkpoint).
+- Tracing: `apps/api/src/tracing/tracer.ts` -> exporter jsonl/console.
+- Evaluation: `apps/api/src/evaluation/*` con dataset/rubriche demo.
+- Contratti condivisi: `shared/types/*` e `apps/api/src/*Contracts.ts`.
+
+Flusso runtime (happy path)
+- Request API -> validazione -> workflow demo.
+- Planner -> Implementer -> Reviewer -> Evaluator -> Security.
+- Checkpoint persistito -> tracer scrive `logs/*.jsonl` -> response.
+
+Diagramma ASCII (happy path)
+```
+API request
+    |
+    v
+validate input
+    |
+    v
+demo workflow
+    |
+    v
+Planner -> Implementer -> Reviewer -> Evaluator -> Security
+    |
+    v
+checkpoint + tracer (jsonl)
+    |
+    v
+API response
+```
+
+Diagramma ASCII (dettagliato)
+```
+API request
+    |
+    v
+apps/api/src/routes/workflow.ts
+    |
+    v
+validate input (zod)
+    |
+    v
+apps/api/src/workflows/orchestrator.ts
+    |
+    v
+apps/api/src/workflows/demoWorkflow.ts
+    |
+    v
+apps/api/src/agents/plannerAgent.ts
+  -> apps/api/src/agents/implementerAgent.ts
+  -> apps/api/src/agents/reviewerAgent.ts
+  -> apps/api/src/agents/evaluatorAgent.ts
+  -> apps/api/src/agents/securityAgent.ts
+    |
+    v
+apps/api/src/tools/toolRegistry.ts
+  -> apps/api/src/tools/filesystemTools.ts
+  -> apps/api/src/tools/gitTools.ts
+  -> apps/api/src/tools/webTools.ts
+    |
+    v
+apps/api/src/memory/checkpointStore.ts
+    |
+    v
+apps/api/src/tracing/tracer.ts
+  -> apps/api/src/tracing/exporters/jsonlExporter.ts
+  -> logs/*.jsonl
+    |
+    v
+API response
+```
+
+Artefatti e dati
+- `logs/*.jsonl`: eventi con `correlationId`, `traceId` e spans.
+- `data/samples/*`: input/output di esempio per demo.
+
 Comandi
 - Installazione (scegli uno):
   - `npm install`
