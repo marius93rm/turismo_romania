@@ -1,0 +1,13 @@
+{
+  "name": "turismo_romania",
+  "private": true,
+  "version": "0.0.1",
+  "description": "AI workflow infrastructure for turismo_romania (no UI).",
+  "workspaces": ["apps/api"],
+  "scripts": {
+    "dev": "npm --prefix apps/api run dev",
+    "demo": "bash scripts/run-demo.sh",
+    "test": "npm --prefix apps/api run test",
+    "eval": "npm --prefix apps/api run eval"
+  }
+}

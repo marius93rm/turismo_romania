@@ -1,0 +1,13 @@
+[
+  {
+    "id": "case_1",
+    "input": {
+      "requestId": "demo_1",
+      "payload": { "demo": true }
+    },
+    "expected": {
+      "summary": "Demo workflow completed",
+      "details": { "placeholder": "[ ]" }
+    }
+  }
+]

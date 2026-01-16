@@ -1,0 +1,3 @@
+# Perche esiste: mantiene la cartella logs nel repo.
+# Quando si usa: i tracer scrivono qui file jsonl.
+# Cosa succede se lo togli o lo fai male: rischi di perdere output in dev.
